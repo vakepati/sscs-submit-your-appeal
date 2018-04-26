@@ -2,6 +2,13 @@ import $ from 'jquery';
 import ShowHideContent from 'govuk/show-hide-content';
 import accessibleAutocomplete from 'accessible-autocomplete';
 import Analytics from 'govuk/analytics/analytics';
+import datePicker from './date-picker';
+
+$(document).ready(() => {
+    initShowHideContent();
+    initAutocomplete();
+    initSYAAnalyticsTrack()
+});
 
 function initShowHideContent() {
   const showHideContent = new ShowHideContent();
