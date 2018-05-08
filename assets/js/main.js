@@ -2,14 +2,7 @@ import $ from 'jquery';
 import ShowHideContent from 'govuk/show-hide-content';
 import accessibleAutocomplete from 'accessible-autocomplete';
 import Analytics from 'govuk/analytics/analytics';
-import datePicker from './date-picker';
-
-
-$(document).ready(() => {
-    initShowHideContent();
-    initAutocomplete();
-    initSYAAnalyticsTrack()
-});
+import datePicker from './date-picker/date-picker';
 
 function initShowHideContent() {
   const showHideContent = new ShowHideContent();
@@ -48,8 +41,16 @@ function initSYAAnalyticsTrack() {
   window.GOVUK.analytics.trackPageview();
 }
 
+function initDatePicker() {
+    if ($('#date-picker').length) {
+        $('.add-another-add-link').hide();
+        datePicker.init();
+    }
+}
+
 $(document).ready(() => {
   initShowHideContent();
   initAutocomplete();
   initSYAAnalyticsTrack();
+  initDatePicker();
 });
