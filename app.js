@@ -47,7 +47,7 @@ app.use(helmet.contentSecurityPolicy({
     defaultSrc: ['\'self\''],
     fontSrc: ['\'self\' data:'],
     scriptSrc: ['\'self\'', '\'unsafe-inline\'', 'www.google-analytics.com'],
-    connectSrc: ['\'self\''],
+    connectSrc: ['\'self\'', 'www.gov.uk'],
     mediaSrc: ['\'self\''],
     frameSrc: ['\'none\''],
     imgSrc: ['\'self\'', 'www.google-analytics.com']
