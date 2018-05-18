@@ -27,9 +27,22 @@ const datePicker = {
     });
   },
   hijackTabIndex: () => {
+    const prevTb = 1;
+    const switchTb = 2;
+    const nextTb = 3;
+    const dowTb = 4;
+    const dTb = 11;
+    $('.prev').attr('tabindex', prevTb);
+    $('.datepicker-switch').attr('tabindex', switchTb);
+    $('.next').attr('tabindex', nextTb);
+    $('.dow').each(function tabIndexOnWeekDays(index) {
+      /* eslint-disable no-invalid-this */
+      $(this).attr('tabindex', dowTb + index);
+      /* eslint-disable no-invalid-this */
+    });
     $('.day:not(".disabled")').each(function addTabIndex(index) {
       /* eslint-disable no-invalid-this */
-      $(this).attr('tabindex', 1 + index);
+      $(this).attr('tabindex', dTb + index);
       /* eslint-disable no-invalid-this */
     });
   },
