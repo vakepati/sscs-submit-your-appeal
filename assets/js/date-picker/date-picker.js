@@ -26,6 +26,13 @@ const datePicker = {
       }
     });
   },
+  hijackTabIndex: () => {
+    $('.day:not(".disabled")').each(function addTabIndex(index) {
+      /* eslint-disable no-invalid-this */
+      $(this).attr('tabindex', 1 + index);
+      /* eslint-disable no-invalid-this */
+    });
+  },
 
   buildDatePicker: datesDisabled => {
     datePicker.selector().datepicker({
@@ -38,25 +45,25 @@ const datePicker = {
       maxViewMode: 0,
       datesDisabled,
       beforeShowDay: date => datePickerUtils.displayFirstOfMonth(date)
-    }).on('changeDate', event => {
-      datePicker.changeDateHandler(event);
-    });
+    }).on('changeDate', event => datePicker.changeDateHandler(event));
     // Update the date-picker with dates that have already been added.
     datePicker.selector().datepicker('setDates', datePicker.getData().map(date => date.value));
+    datePicker.selector().off('keydown');
+    window.setTimeout(datePicker.hijackTabIndex, 0);
   },
 
   selector: () => $('#date-picker'),
 
   changeDateHandler: event => {
     const dates = event.dates;
+    datePicker.hijackTabIndex();
     const currentDates = datePicker.getData();
     if (datePickerUtils.isDateAdded(currentDates, dates)) {
-      datePicker.postDate(dates);
+      return datePicker.postDate(dates);
     } else if (datePickerUtils.isDateRemoved(currentDates, dates)) {
-      datePicker.removeDate(dates);
-    } else {
-      datePicker.displayDateList(dates);
+      return datePicker.removeDate(dates);
     }
+    return datePicker.displayDateList(dates);
   },
 
   displayDateList: dates => {
@@ -95,13 +102,11 @@ const datePicker = {
     };
     const index = indexOf(dates, lastestDateAdded);
 
-    $.ajax({
+    return $.ajax({
       type: 'POST',
       url: `/dates-cant-attend/item-${index}`,
       data: body,
-      success: () => {
-        datePicker.displayDateList(dates);
-      }
+      success: () => datePicker.displayDateList(dates)
     });
   },
 
@@ -112,12 +117,10 @@ const datePicker = {
     const dateToRemove = differenceWith(oldDates, newDates, isEqual).toString();
     const index = datePickerUtils.getIndexFromDate(data, dateToRemove);
 
-    $.ajax({
+    return $.ajax({
       type: 'GET',
       url: `/dates-cant-attend/item-${index}/delete`,
-      success: () => {
-        datePicker.displayDateList(newDates);
-      }
+      success: () => datePicker.displayDateList(newDates)
     });
   },
 
