@@ -32,21 +32,24 @@ const datePicker = {
     const nextTb = 3;
     const dowTb = 4;
     const dTb = 11;
+    /* eslint-disable no-invalid-this */
     $('.prev').attr('tabindex', prevTb);
     $('.datepicker-switch').attr('tabindex', switchTb);
     $('.next').attr('tabindex', nextTb);
     $('.dow').each(function tabIndexOnWeekDays(index) {
-      /* eslint-disable no-invalid-this */
       $(this).attr('tabindex', dowTb + index);
-      /* eslint-disable no-invalid-this */
     });
     $('.day:not(".disabled")').each(function addTabIndex(index) {
-      /* eslint-disable no-invalid-this */
       $(this).attr('tabindex', dTb + index);
-      /* eslint-disable no-invalid-this */
     });
+    /* eslint-enable no-invalid-this */
   },
   addAriaAttributes: () => {
+    /* eslint-disable no-invalid-this */
+    $('.dow').each(function tabIndexOnWeekDays(index) {
+      $(this).attr('aria-label',
+        ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'][index]);
+    });
     $('.day:not(".disabled")').each(function addAriaRole() {
       const attrib = parseInt($(this).attr('data-date'), 10);
       const content = $(this).text();
@@ -54,6 +57,7 @@ const datePicker = {
       $(this).attr('aria-pressed', $(this).hasClass('active') ? 'true' : 'false');
       $(this).html(`<div aria-label="${moment(attrib).format('DD MMMM YYYY')}">${content}</div>`);
     });
+    /* eslint-enable no-invalid-this */
   },
   addAccessibilityFeatures: () => {
     datePicker.hijackTabIndex();
@@ -75,8 +79,6 @@ const datePicker = {
         // datePicker.selector().datepicker('setDate',
         // document.activeElement.getAttribute('data-date'));
         // doesn't contain the same set of information contained in the dom-generated event.
-        // Looks like it's not a bug,
-        // but an intentional feature from the dp developers.
         $(document.activeElement).trigger('click');
         break;
       case leftArrowKey:
