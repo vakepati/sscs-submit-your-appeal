@@ -46,7 +46,26 @@ const datePicker = {
       /* eslint-disable no-invalid-this */
     });
   },
-
+  enableKeyActions: () => {
+    const enterKey = 13;
+    /* eslint-disable consistent-return */
+    datePicker.selector().on('keydown', event => {
+      switch (event.keyCode) {
+      case enterKey:
+        // Why this? Because the synthetic event triggered by
+        // datePicker.selector().datepicker('setDate',
+        // document.activeElement.getAttribute('data-date'));
+        // doesn't contain all the information contained in the dom-generated event.
+        // Looks like it's not a bug,
+        // but an intentional feature from the dp developers.
+        $(document.activeElement).trigger('click');
+        break;
+      default:
+        return true;
+      }
+    });
+    /* eslint-enable consistent-return */
+  },
   buildDatePicker: datesDisabled => {
     datePicker.selector().datepicker({
       multidate: true,
@@ -62,6 +81,7 @@ const datePicker = {
     // Update the date-picker with dates that have already been added.
     datePicker.selector().datepicker('setDates', datePicker.getData().map(date => date.value));
     datePicker.selector().off('keydown');
+    datePicker.enableKeyActions();
     window.setTimeout(datePicker.hijackTabIndex, 0);
   },
 
