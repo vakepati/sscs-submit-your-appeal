@@ -51,6 +51,7 @@ const datePicker = {
       const attrib = parseInt($(this).attr('data-date'), 10);
       const content = $(this).text();
       $(this).attr('aria-role', 'button');
+      $(this).attr('aria-pressed', $(this).hasClass('active') ? 'true' : 'false');
       $(this).html(`<div aria-label="${moment(attrib).format('DD MMMM YYYY')}">${content}</div>`);
     });
   },
