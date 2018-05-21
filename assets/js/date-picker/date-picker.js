@@ -48,17 +48,37 @@ const datePicker = {
   },
   enableKeyActions: () => {
     const enterKey = 13;
+    const leftArrowKey = 37;
+    const upArrowKey = 38;
+    const rightArrowKey = 39;
+    const downArrowKey = 40;
     /* eslint-disable consistent-return */
     datePicker.selector().on('keydown', event => {
+      const index = $(document.activeElement)
+        .closest('tr').children().index($(document.activeElement));
       switch (event.keyCode) {
       case enterKey:
         // Why this? Because the synthetic event triggered by
         // datePicker.selector().datepicker('setDate',
         // document.activeElement.getAttribute('data-date'));
-        // doesn't contain all the information contained in the dom-generated event.
+        // doesn't contain the same set of information contained in the dom-generated event.
         // Looks like it's not a bug,
         // but an intentional feature from the dp developers.
         $(document.activeElement).trigger('click');
+        break;
+      case leftArrowKey:
+        $(document.activeElement).prev('td').focus();
+        break;
+      case rightArrowKey:
+        $(document.activeElement).next('td').focus();
+        break;
+      case upArrowKey:
+        event.preventDefault();
+        $(document.activeElement).closest('tr').prev().find(`td:eq(${index})`).focus();
+        break;
+      case downArrowKey:
+        event.preventDefault();
+        $(document.activeElement).closest('tr').next().find(`td:eq(${index})`).focus();
         break;
       default:
         return true;
