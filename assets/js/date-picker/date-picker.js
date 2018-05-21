@@ -46,6 +46,18 @@ const datePicker = {
       /* eslint-disable no-invalid-this */
     });
   },
+  addAriaAttributes: () => {
+    $('.day:not(".disabled")').each(function addAriaRole() {
+      const attrib = parseInt($(this).attr('data-date'), 10);
+      const content = $(this).text();
+      $(this).attr('aria-role', 'button');
+      $(this).html(`<div aria-label="${moment(attrib).format('DD MMMM YYYY')}">${content}</div>`);
+    });
+  },
+  addAccessibilityFeatures: () => {
+    datePicker.hijackTabIndex();
+    datePicker.addAriaAttributes();
+  },
   enableKeyActions: () => {
     const enterKey = 13;
     const leftArrowKey = 37;
@@ -102,14 +114,14 @@ const datePicker = {
     datePicker.selector().datepicker('setDates', datePicker.getData().map(date => date.value));
     datePicker.selector().off('keydown');
     datePicker.enableKeyActions();
-    window.setTimeout(datePicker.hijackTabIndex, 0);
+    window.setTimeout(datePicker.addAccessibilityFeatures, 0);
   },
 
   selector: () => $('#date-picker'),
 
   changeDateHandler: event => {
     const dates = event.dates;
-    datePicker.hijackTabIndex();
+    datePicker.addAccessibilityFeatures();
     const currentDates = datePicker.getData();
     if (datePickerUtils.isDateAdded(currentDates, dates)) {
       return datePicker.postDate(dates);
