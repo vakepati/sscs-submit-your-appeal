@@ -1,7 +1,6 @@
 import $ from 'jquery';
 import ShowHideContent from 'govuk/show-hide-content';
 import accessibleAutocomplete from 'accessible-autocomplete';
-import Analytics from 'govuk/analytics/analytics';
 import datePicker from './date-picker/date-picker';
 
 function initShowHideContent() {
@@ -18,29 +17,6 @@ function initAutocomplete() {
   });
 }
 
-function initSYAAnalyticsTrack() {
-  Analytics.load();
-
-  // Use document.domain in dev, preview and staging so that tracking works
-  // Otherwise explicitly set the domain as www.gov.uk (and not gov.uk).
-  const cookieDomain = (document.domain === 'www.gov.uk') ? '.www.gov.uk' : document.domain;
-
-  window.GOVUK.analytics = new Analytics({
-    universalId: 'UA-91309785-4',
-    cookieDomain
-  });
-
-  // Set custom dimensions before tracking pageviews
-  // analytics.setDimension(…)
-
-  // Activate any event plugins eg. print intent, error tracking
-  // analyticsPlugins.error();
-  // analyticsPlugins.printIntent();
-
-  // Track initial pageview
-  window.GOVUK.analytics.trackPageview();
-}
-
 function initDatePicker() {
   if ($('#date-picker').length) {
     $('.add-another-add-link').hide();
@@ -51,6 +27,5 @@ function initDatePicker() {
 $(document).ready(() => {
   initShowHideContent();
   initAutocomplete();
-  initSYAAnalyticsTrack();
   initDatePicker();
 });
