@@ -47,8 +47,11 @@ const datePicker = {
   addAriaAttributes: () => {
     /* eslint-disable no-invalid-this */
     $('.dow').each(function tabIndexOnWeekDays(index) {
-      $(this).attr('aria-label',
-        ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'][index]);
+      const content = $(this).text();
+      $(this).html(`<div aria-label="${[
+        'Monday', 'Tuesday',
+        'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'
+      ][index]}">${content}</div>`);
     });
     $('.day:not(".disabled")').each(function addAriaRole() {
       const attrib = parseInt($(this).attr('data-date'), 10);
