@@ -30,14 +30,11 @@ class EvidenceUpload extends Question {
     const pathToUploadFolder = './../../../uploads';
     const logger = Logger.getLogger('EvidenceUpload.js');
     if (req.method.toLowerCase() === 'post') {
-
       //res.status(413);
       //return res.render('evidence', { uploadEv: req.params.uploadEv, field });
 
       return EvidenceUpload.makeDir(pathToUploadFolder, mkdirError => {
         if (mkdirError) {
-          console.info('next mkdir')
-
           return next(mkdirError);
         }
 
@@ -48,80 +45,38 @@ class EvidenceUpload extends Question {
         });
 
         incoming.once('error', er => {
-          console.info('error')
-
           logger.info('error while receiving the file from the client', er);
         });
 
         incoming.on('fileBegin', function(field, file) {
-          console.info('fileBegin')
-
-          console.info('file begin ', arguments)
-          console.log(file.type) // => mime type
           if (file.type !== 'image/jpeg') {
             return this.emit('error', 'Size must not be over 3MB');
-             // req.pause();
-            //return next(new Error('not the right file'));
-            //req.connection.destroy();
-/*            try { throw new Error("Stopping file upload..."); }
-            catch (e) {*/
-             // res.status(413);
-             // return res.send('oh my')
-            /*}*/
           }
         });
 
         incoming.once('file', (field, file) => {
-          console.info('file')
-
           const pathToFile = `${pt.resolve(__dirname, pathToUploadFolder)}/${file.name}`;
           fs.rename(file.path, pathToFile);
         });
 
-        incoming.on('progress', () => {
-          console.info('that is progress')
-        })
-
-        incoming.once('error', error => {
-          console.info('error')
-
-
-          console.info('next error')
-          //return next(error);
-        });
 
         incoming.once('aborted', () => {
-          console.info('aborted')
-
           logger.log('user aborted upload');
-          /*res.writeHead (413, {"connection": 'close', "content-type": 'text/plain'});
-          return res.end ('something wrong')*/
-          console.info('next aborted')
-
           return next(new Error())
         });
 
         incoming.once('end', () => {
-          console.info('end')
-
           logger.log('-> upload done');
         });
 
         return incoming.parse(req, (uploadingError, fields, files) => {
-          console.info('parse')
-
           if (uploadingError) {
             logger.warn('an error has occured with form upload', uploadingError);
-           // console.log('ERROR uploading the file:',error.message);
             res.header('Connection', 'close');
             res.status(400).send({ status:'error' });
-            setTimeout(function() { res.end(); }, 500);
-            console.info('is this no ', uploadingError)
-            return;
-            //req.client.destroy();
-            //return res.send('oh my')
 
-            //return next(uploadingError);
+            setTimeout(function() { res.end(); }, 500);
+            return;
           }
           const pathToFile = `${pt
             .resolve(__dirname, pathToUploadFolder)}/${files.uploadEv.name}`;
@@ -139,23 +94,18 @@ class EvidenceUpload extends Question {
                 uploadEv: b.documents[0].originalDocumentName,
                 link: b.documents[0]._links.self.href
               };
-              console.info('next unlink')
-
               return fs.unlink(pathToFile, next);
             }
-            console.info('next forwarding')
-
             return next(forwardingError);
           });
         });
       });
     }
-    console.info('next last')
     return next();
   }
 
   get middleware() {
-    return [EvidenceUpload.handleUpload, ...super.middleware];
+    return [...super.middleware, EvidenceUpload.handleUpload];
   }
 
   get form() {
