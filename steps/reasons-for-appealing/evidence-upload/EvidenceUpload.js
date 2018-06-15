@@ -74,6 +74,7 @@ class EvidenceUpload extends Question {
             logger.warn('an error has occured with form upload', uploadingError);
             res.header('Connection', 'close');
             res.status(400).send({ status:'error' });
+            //res.status(400).render(req.journey.instances.EvidenceUpload.template ));
 
             setTimeout(function() { res.end(); }, 500);
             return;
