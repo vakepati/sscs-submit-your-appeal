@@ -1,7 +1,7 @@
 const paths = require('paths');
 const representative = require('steps/representative/representative-details/content.en').fields;
 
-Feature('Representative Details');
+Feature('Representative Details @batch-10');
 
 Before(I => {
   I.createTheSession();
@@ -42,6 +42,12 @@ Scenario('When I click continue without entering a name or organisation, I see e
 
 Scenario('When I enter a name and continue, I do not see errors', I => {
   I.fillField('input[name="name.first"]', 'Harry');
+  I.click('Continue');
+  I.dontSee(representative.name.error.required);
+});
+
+Scenario('When I enter a name with special characters and continue, I do not see errors', I => {
+  I.fillField('input[name="name.first"]', 'André-Ottö');
   I.click('Continue');
   I.dontSee(representative.name.error.required);
 });

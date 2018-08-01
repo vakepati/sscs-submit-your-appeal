@@ -1,3 +1,7 @@
+const config = require('config');
+
+const evidenceUploadEnabled = config.get('features.evidenceUpload.enabled');
+
 module.exports = {
 
   health: '/health',
@@ -17,13 +21,16 @@ module.exports = {
 
   policy: {
     cookiePolicy: '/cookie-policy',
-    termsAndConditions: '/terms-and-conditions'
+    termsAndConditions: '/terms-and-conditions',
+    privacy: '/privacy-policy',
+    contactUs: '/contact-us'
   },
 
   session: {
     createSession: '/create-session',
     entry: '/entry',
     exit: '/exit',
+    timeout: '/session-timeout',
     sessions: '/sessions'
   },
 
@@ -74,7 +81,10 @@ module.exports = {
   reasonsForAppealing: {
     reasonForAppealing: '/reason-for-appealing',
     otherReasonForAppealing: '/other-reason-for-appealing',
-    sendingEvidence: '/sending-evidence'
+    sendingEvidence: '/sending-evidence',
+    evidenceProvide: evidenceUploadEnabled ? '/evidence-provide' : null,
+    evidenceUpload: evidenceUploadEnabled ? '/evidence-upload' : null,
+    evidenceDescription: evidenceUploadEnabled ? '/evidence-description' : null
   },
 
   hearing: {

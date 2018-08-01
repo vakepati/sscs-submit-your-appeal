@@ -1,10 +1,11 @@
 /* eslint-disable max-len */
 
 const { expect } = require('test/util/chai');
-const { formatMobileNumber } = require('utils/stringUtils');
 const AppellantContactDetails = require('steps/identity/appellant-contact-details/AppellantContactDetails');
 const paths = require('paths');
 const userAnswer = require('utils/answer');
+const proxyquire = require('proxyquire');
+const sinon = require('sinon');
 
 describe('AppellantContactDetails.js', () => {
   let appellantContactDetails = null;
@@ -15,7 +16,8 @@ describe('AppellantContactDetails.js', () => {
         steps: {
           TextReminders: paths.smsNotify.appellantTextReminders
         }
-      }
+      },
+      session: {}
     });
 
     appellantContactDetails.fields = {
@@ -42,9 +44,9 @@ describe('AppellantContactDetails.js', () => {
       expect(appellantContactDetails.CYAPhoneNumber).to.equal(userAnswer.NOT_PROVIDED);
     });
 
-    it('should return a formatted mobile number if a phoneNumber value has been set', () => {
+    it('should return the phone number if a phoneNumber value has been set', () => {
       appellantContactDetails.fields.phoneNumber.value = '0800109756';
-      expect(appellantContactDetails.CYAPhoneNumber).to.equal(formatMobileNumber(appellantContactDetails.fields.phoneNumber.value));
+      expect(appellantContactDetails.CYAPhoneNumber).to.equal(appellantContactDetails.fields.phoneNumber.value);
     });
   });
 
@@ -56,6 +58,70 @@ describe('AppellantContactDetails.js', () => {
     it('should return the email address if an emailaddress value has been set', () => {
       appellantContactDetails.fields.emailAddress.value = 'myemailaddress@sscs.com';
       expect(appellantContactDetails.CYAEmailAddress).to.equal(appellantContactDetails.fields.emailAddress.value);
+    });
+  });
+
+  describe('isEnglandOrWalesPostcode', () => {
+    describe('postcode checker disabled', () => {
+      it('does not check postcode when postcode checker disabled', () => {
+        const appellantContactDetailsWithoutPostcodeChecker = proxyquire('steps/identity/appellant-contact-details/AppellantContactDetails', {
+          config: { get: () => false }
+        });
+
+        const theSession = {};
+        const req = { session: theSession };
+        const resp = sinon.stub();
+        const next = sinon.stub();
+
+        appellantContactDetailsWithoutPostcodeChecker.isEnglandOrWalesPostcode(req, resp, next);
+
+        expect(theSession.invalidPostcode).to.equal(false);
+        expect(next).to.have.been.called;
+      });
+    });
+
+
+    describe('postcode checker enabled', () => {
+      let responseFromPostcodeChecker = null;
+      let appellantContactDetailsWithoutPostcodeChecker = null;
+      const theSession = {};
+      const req = { session: theSession, method: 'POST', body: { postCode: 'S10 2FG' } };
+
+      beforeEach(() => {
+        appellantContactDetailsWithoutPostcodeChecker = proxyquire('steps/identity/appellant-contact-details/AppellantContactDetails', {
+          config: { get: () => true },
+          'utils/postcodeChecker': () => {
+            return responseFromPostcodeChecker;
+          }
+        });
+      });
+
+      it('checks postcode and it is valid', done => {
+        responseFromPostcodeChecker = Promise.resolve(true);
+
+        appellantContactDetailsWithoutPostcodeChecker.isEnglandOrWalesPostcode(req, {}, () => {
+          expect(theSession.invalidPostcode).to.equal(false);
+          done();
+        });
+      });
+
+      it('checks postcode and it is invalid', done => {
+        responseFromPostcodeChecker = Promise.resolve(false);
+
+        appellantContactDetailsWithoutPostcodeChecker.isEnglandOrWalesPostcode(req, {}, () => {
+          expect(theSession.invalidPostcode).to.equal(true);
+          done();
+        });
+      });
+
+      it('error checking postcode', done => {
+        responseFromPostcodeChecker = Promise.reject(new Error());
+
+        appellantContactDetailsWithoutPostcodeChecker.isEnglandOrWalesPostcode(req, {}, () => {
+          expect(theSession.invalidPostcode).to.equal(true);
+          done();
+        });
+      });
     });
   });
 
@@ -219,6 +285,20 @@ describe('AppellantContactDetails.js', () => {
           }
         }
       });
+    });
+
+    it('removes whitespace from before and after the postcode string', () => {
+      appellantContactDetails.fields.postCode.value = ' Post code ';
+      const postcode = appellantContactDetails.values().appellant.contactDetails.postCode;
+      expect(postcode).to.not.equal(' Post code ');
+      expect(postcode).to.equal('Post code');
+    });
+
+    it('removes whitespace from before and after the phone number string', () => {
+      appellantContactDetails.fields.phoneNumber.value = ' 0800109756 ';
+      const phoneNumber = appellantContactDetails.values().appellant.contactDetails.phoneNumber;
+      expect(phoneNumber).to.not.equal(' 0800109756 ');
+      expect(phoneNumber).to.equal('0800109756');
     });
   });
 

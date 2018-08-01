@@ -7,10 +7,15 @@
   "redis": {
     "url": "redis://127.0.0.1:6379",
     "secret": "defaultsecret",
-    "useSSL": "false"
+    "useSSL": "false",
+    "timeout": 1200
+  },
+  "frontend": {
+    "inactivityAlert": 1080
   },
   "api": {
-    "url":  "http://localhost:8080"
+    "url":  "http://localhost:8080",
+    "uploadEvidenceUrl": "http://localhost:3010/upload"
   },
   "appInsights": {
     "instrumentationKey": "iKey"
@@ -25,7 +30,18 @@
   "e2e": {
     "waitForTimeout": "1000",
     "waitForAction": "500",
-    "outputDir": "./output",
+    "outputDir": "./functional-output",
     "frontendUrl": "http://localhost:3000"
+  },
+  "features": {
+    "evidenceUpload": {
+      "enabled": false,
+      "maxFileSize": 10
+    }
+  },
+  "postcodeChecker": {
+    "endpoint": "/regionalcentre",
+    "enabled": false,
+    "allowedRpcs": "birmingham"
   }
 }

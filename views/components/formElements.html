@@ -34,6 +34,7 @@
         <label for="{{ field.month.id }}">{{ labels.month | default('Month') }}</label>
         <input class="form-control {{ errorClass(field.month, 'control') }} {{ errorClass(field, 'control') }}"
                id="{{ field.month.id }}"
+               type="text"
                name="{{ field.month.id }}"
                {% if field.month.value %}value="{{ field.month.value }}"{% endif %}>
     </div>
@@ -53,17 +54,17 @@
 
 {% endmacro %}
 
-{% macro textarea(field, label, hint="", hideLabel=false) %}
+{% macro textarea(field, label, hint="", hideLabel=false, placeholder="", maxlength=0) %}
 
 <div class="form-group {{ errorClass(field) }}">
 
-    <label class="form-label {{ 'visually-hidden' if hideLabel }}" for="{{ field.id }}">{{ label | safe }}</label>
+    <label id="{{ field.id }}-label" class="form-label {{ 'visually-hidden' if hideLabel }}" for="{{ field.id }}">{{ label | safe }}</label>
 
     {% if hint %}
     <span class="form-hint">{{ hint | safe }}</span>
     {% endif %}
 
     {{ errorsFor(field) }}
-    <textarea class="form-control" id="{{ field.id }}" name="{{ field.id }}" rows="7">{{ field.value | default('') }}</textarea>
+    <textarea placeholder="{{ placeholder }}" aria-labelledby="{{ field.id }}-label" class="form-control" id="{{ field.id }}" name="{{ field.id }}" rows="7"{% if maxlength %} maxlength="{{ maxlength }}"{% endif %}>{{ field.value | default('') }}</textarea>
 </div>
 {% endmacro %}

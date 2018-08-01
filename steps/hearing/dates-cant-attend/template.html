@@ -3,6 +3,13 @@
 {% from "look-and-feel/components/fields.njk" import formSection %}
 {% from "components/formElements.html" import date %}
 
+{% block head %}
+{{ super() }}
+<noscript>
+    <meta http-equiv="refresh" content="{{ timeOut }};URL='/session-timeout'">
+</noscript>
+{% endblock %}
+
 {% block page_title %}{{ content.titleHead }}{% endblock %}
 
 {% set title %}
@@ -11,26 +18,43 @@
 {% endset %}
 
 {% set pageContent = {
-  addAnotherLink: addAnotherLinkContent,
-  itemLabel: content.fields.cantAttendDate.legend,
-  noItemsMessage: content.noDates,
-  itemsListLabel: content.fields.cantAttendDate.legendList,
-  editItemLabel: content.fields.cantAttendDate.legend
+    addAnotherLink: addAnotherLinkContent,
+    itemLabel: content.fields.cantAttendDate.legend,
+    noItemsMessage: content.noDates,
+    itemsListLabel: content.fields.cantAttendDate.legendList,
+    hideItemsListLabel: true,
+    editItemLabel: content.fields.cantAttendDate.legend
 } %}
+
+{% block full_width %}
+{{ super() }}
+<div>
+    {% include "components/inactivity-alert.html" %}
+</div>
+{% endblock %}
 
 {% block item %}
 <span data-index="{{ safeId(item.id) }}">{{ item.value.format('dddd D MMMM YYYY') }}</span>
 {% endblock %}
 
 {% block listItems %}
-    <p>{{ content.itsImportant }}</p>
-    <p>{{ content.yourHearing }}</p>
+
+    <div id="date-picker-content">
+        <p>{{ content.datePicker.itsImportant }}</p>
+        <p>{{ content.datePicker.select }} <span class="bold">{{ content.datePicker.cant }}</span> {{ content.datePicker.hearing }}</p>
+    </div>
+    <noscript>
+        <p>{{ content.nonJS.itsImportant }}</p>
+        <p>{{ content.nonJS.yourHearing }}</p>
+    </noscript>
 
     <div id="date-picker" class="datepicker"></div>
+
+    <h2 class="heading-medium">{{ content.fields.cantAttendDate.legendList }}</h2>
     {{ super() }}
 {% endblock %}
 
 {% block editItem %}
-    <p>{{ content.yourHearing }}</p>
+    <p>{{ content.nonJS.yourHearing }}</p>
   {{ date(fields.item, content.fields.cantAttendDate.legend) }}
 {% endblock %}

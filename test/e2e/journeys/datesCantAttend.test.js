@@ -9,7 +9,7 @@ const datesYouCantAttend = selectors.theHearing.datesYouCantAttend;
 const datesYouCantAttendHearingAnswer = `${datesYouCantAttend}  ${selectors.answer}`;
 const datesYouCantAttendHearingChange = `${datesYouCantAttend}  ${selectors.change}`;
 
-Feature('Appellant PIP, one month ago, attends hearing with dates cannot attend');
+Feature('Appellant PIP, one month ago, attends hearing with dates cannot attend @batch-01');
 
 Before(I => {
   I.createTheSession();
@@ -22,25 +22,23 @@ After(I => {
 
 Scenario('Provides date of when they cannot attend the hearing', async I => {
   const randomWeekDay = DateUtils.getRandomWeekDayFromDate(moment().add(5, 'weeks'));
-
   I.enterDetailsFromStartToNINO();
   I.enterAppellantContactDetailsAndContinue();
   I.selectDoYouWantToReceiveTextMessageReminders(doYouWantTextMsgReminders.no);
-  I.enterDetailsFromNoRepresentativeToSendingEvidence();
+  I.enterDetailsFromNoRepresentativeToUploadingEvidence();
   await I.enterDetailsFromAttendingTheHearingToEnd(randomWeekDay);
   I.confirmDetailsArePresent();
   I.see(randomWeekDay.format('DD MMMM YYYY'), datesYouCantAttendHearingAnswer);
-});
+}).retry(1);
 
 Scenario('Provides a single date when they cannot attend the hearing, then edits the date',
   async I => {
     const randomWeekDayIn5Weeks = DateUtils.getRandomWeekDayFromDate(moment().add(5, 'weeks'));
     const randomWeekDayIn6Weeks = DateUtils.getRandomWeekDayFromDate(moment().add(6, 'weeks'));
-
     I.enterDetailsFromStartToNINO();
     I.enterAppellantContactDetailsAndContinue();
     I.selectDoYouWantToReceiveTextMessageReminders(doYouWantTextMsgReminders.no);
-    I.enterDetailsFromNoRepresentativeToSendingEvidence();
+    I.enterDetailsFromNoRepresentativeToUploadingEvidence();
     await I.enterDetailsFromAttendingTheHearingToEnd(randomWeekDayIn5Weeks);
     I.see(randomWeekDayIn5Weeks.format('DD MMMM YYYY'), datesYouCantAttendHearingAnswer);
 
@@ -51,4 +49,4 @@ Scenario('Provides a single date when they cannot attend the hearing, then edits
     I.enterDateCantAttendAndContinue(randomWeekDayIn6Weeks, 'Edit');
     I.click('Continue');
     I.see(randomWeekDayIn6Weeks.format('DD MMMM YYYY'), datesYouCantAttendHearingAnswer);
-  });
+  }).retry(1);

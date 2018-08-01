@@ -58,6 +58,12 @@
       }, {
         "whatYouDisagreeWith": "Disagree with C",
         "reasonForAppealing": "Reason for appealing C"
+      }, {
+        "whatYouDisagreeWith": "All",
+        "reasonForAppealing": "None"
+      }, {
+        "whatYouDisagreeWith": "          ",
+        "reasonForAppealing": "          "
       }
     ],
     "otherReasons": "Others reasons.."
@@ -67,7 +73,7 @@
     "wantsSupport": true,
     "anythingElse": "Yes, this...",
     "interpreterLanguageType": "Portuguese",
-    "signLanguageType": "Sign (American Sign)",
+    "signLanguageType": "Lipspeak",
     "arrangements": {
       "languageInterpreter": true,
       "signLanguageInterpreter": true,

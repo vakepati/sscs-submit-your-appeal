@@ -1,4 +1,3 @@
-const { formatMobileNumber } = require('utils/stringUtils');
 const startAnAppealContent = require('landing-pages/start-an-appeal/content.en');
 const textRemindersContent = require('steps/sms-notify/text-reminders/content.en');
 const DateUtils = require('utils/DateUtils');
@@ -14,7 +13,7 @@ const txtMsgRemindersMobAnswer = `${selectors.textMsgReminders.mobileNumber} ${s
 
 Feature('Full Journey');
 
-Scenario('Appellant full journey from /start-an-appeal to the /confirmation page @smoke',
+xScenario('Appellant full journey from /start-an-appeal to the /check-your-appeal page @smoke',
   async I => {
     const randomWeekDay = DateUtils.getDateInMilliseconds(
       DateUtils.getRandomWeekDayFromDate(moment().utc().startOf('day').add(5, 'weeks'))
@@ -27,12 +26,13 @@ Scenario('Appellant full journey from /start-an-appeal to the /confirmation page
     I.checkOptionAndContinue(doYouWantTextMsgReminders.yes);
     I.checkOptionAndContinue('#useSameNumber-yes');
     I.readSMSConfirmationAndContinue();
-    I.enterDetailsFromNoRepresentativeToSendingEvidence();
+    I.enterDetailsFromNoRepresentativeToUploadingEvidence();
     await I.enterDetailsFromAttendingTheHearingDatePickerToEnd(randomWeekDay);
     I.confirmDetailsArePresent();
-    I.see(formatMobileNumber(appellant.contactDetails.phoneNumber), appellantPhoneNumberAnswer);
-    I.see(formatMobileNumber(appellant.contactDetails.phoneNumber), txtMsgRemindersMobAnswer);
-    I.signAndSubmit(`${appellant.firstName} ${appellant.lastName}`);
-    I.wait(2);
-    I.seeCurrentUrlEquals(paths.confirmation);
+    I.see(appellant.contactDetails.phoneNumber, appellantPhoneNumberAnswer);
+    I.see(appellant.contactDetails.phoneNumber, txtMsgRemindersMobAnswer);
+    I.seeCurrentUrlEquals(paths.checkYourAppeal);
+    I.see('Personal Independence Payment (PIP)');
+    I.see('Hearing arrangements');
+    I.see('Portuguese');
   });

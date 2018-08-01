@@ -1,4 +1,4 @@
-require('app-insights')();
+require('app-insights').enable();
 const { Logger, Express } = require('@hmcts/nodejs-logging');
 const { journey } = require('@hmcts/one-per-page');
 const lookAndFeel = require('@hmcts/look-and-feel');
@@ -17,6 +17,9 @@ const policyPages = require('policy-pages/routes');
 const content = require('content.en.json');
 const urls = require('urls');
 const HttpStatus = require('http-status-codes');
+/* eslint-disable max-len */
+const fileTypeWhitelist = require('steps/reasons-for-appealing/evidence-upload/fileTypeWhitelist.js');
+/* eslint-enable max-len */
 
 const logger = Logger.getLogger('app.js');
 const app = express();
@@ -114,6 +117,13 @@ lookAndFeel.configure(app, {
         {
           test: /\.(png|jpg)$/i,
           loaders: ['file-loader']
+        },
+        {
+          test: /\.(njk|nunjucks)$/,
+          loader: 'nunjucks-loader',
+          query: {
+            root: path.resolve(__dirname, '/dist/nunjucks')
+          }
         }
       ]
     },
@@ -123,6 +133,15 @@ lookAndFeel.configure(app, {
           {
             from: path.resolve(__dirname, 'assets/images'),
             to: 'images'
+          },
+          {
+            from: path.resolve(__dirname,
+              'node_modules/@hmcts/look-and-feel/templates/look-and-feel/components/fields.njk'),
+            to: 'nunjucks/look-and-feel/components/fields.njk'
+          },
+          {
+            from: path.resolve(__dirname, 'views/components/formElements.html'),
+            to: 'nunjucks/formElements.njk'
           }
         ])
     ]
@@ -130,19 +149,35 @@ lookAndFeel.configure(app, {
   nunjucks: {
     globals: {
       phase: 'BETA',
+      environment: process.env.NODE_ENV,
       banner: `${content.phaseBanner.newService}
         <a href="${urls.phaseBanner}" target="_blank">
             ${content.phaseBanner.reportProblem}
         </a>${content.phaseBanner.improve}`,
       isArray(value) {
         return Array.isArray(value);
-      }
+      },
+      inactivityTimeout: {
+        title: content.inactivityTimeout.title,
+        expiringIn: content.inactivityTimeout.expiringIn,
+        text: content.inactivityTimeout.text,
+        yes: content.inactivityTimeout.yes,
+        no: content.inactivityTimeout.no
+      },
+      accept: fileTypeWhitelist,
+      timeOut: config.get('redis.timeout'),
+      timeOutMessage: content.timeout.message,
+      relatedContent: content.relatedContent,
+      paths,
+      urls
     }
   },
   development: {
     useWebpackDevMiddleware: true
   }
 });
+
+app.set('trust proxy', 1);
 
 journey(app, {
   baseUrl,
@@ -153,7 +188,7 @@ journey(app, {
       connect_timeout: 15000
     },
     cookie: {
-      secure: config.redis.useSSL === 'true'
+      secure: protocol === 'https'
     },
     secret: config.redis.secret
   },

@@ -9,7 +9,8 @@ const datesYouCantAttend = selectors.theHearing.datesYouCantAttend;
 const datesYouCantAttendHearingAnswer = `${datesYouCantAttend}  ${selectors.answer}`;
 const datesYouCantAttendHearingChange = `${datesYouCantAttend}  ${selectors.change}`;
 
-Feature('Appellant PIP, one month ago, attends hearing with dates cannot attend using date-picker');
+/* eslint-disable max-len */
+Feature('Appellant PIP, one month ago, attends hearing with dates cannot attend using date-picker @batch-01');
 
 Before(I => {
   I.createTheSession();
@@ -24,15 +25,14 @@ Scenario('Selects date of when they cannot attend the hearing', async I => {
   const randomWeekDay = DateUtils.getDateInMilliseconds(
     DateUtils.getRandomWeekDayFromDate(moment().utc().startOf('day').add(5, 'weeks'))
   );
-
   I.enterDetailsFromStartToNINO();
   I.enterAppellantContactDetailsAndContinue();
   I.selectDoYouWantToReceiveTextMessageReminders(doYouWantTextMsgReminders.no);
-  I.enterDetailsFromNoRepresentativeToSendingEvidence();
+  I.enterDetailsFromNoRepresentativeToUploadingEvidence();
   await I.enterDetailsFromAttendingTheHearingDatePickerToEnd(randomWeekDay);
   I.confirmDetailsArePresent();
   I.see(moment(randomWeekDay).format('DD MMMM YYYY'), datesYouCantAttendHearingAnswer);
-});
+}).retry(1);
 
 Scenario('Selects a date when they cannot attend the hearing, then edits the date', async I => {
   const randomWeekDayIn5Weeks = DateUtils.getDateInMilliseconds(
@@ -45,7 +45,7 @@ Scenario('Selects a date when they cannot attend the hearing, then edits the dat
   I.enterDetailsFromStartToNINO();
   I.enterAppellantContactDetailsAndContinue();
   I.selectDoYouWantToReceiveTextMessageReminders(doYouWantTextMsgReminders.no);
-  I.enterDetailsFromNoRepresentativeToSendingEvidence();
+  I.enterDetailsFromNoRepresentativeToUploadingEvidence();
   await I.enterDetailsFromAttendingTheHearingDatePickerToEnd(randomWeekDayIn5Weeks);
   I.see(moment(randomWeekDayIn5Weeks).format('DD MMMM YYYY'), datesYouCantAttendHearingAnswer);
 
@@ -54,7 +54,8 @@ Scenario('Selects a date when they cannot attend the hearing, then edits the dat
   I.seeCurrentUrlEquals(paths.hearing.hearingAvailability);
   I.click('Continue');
   await I.deselectDates([randomWeekDayIn5Weeks]);
+  I.wait(2);
   await I.selectDates([randomWeekDayIn6Weeks]);
   I.click('Continue');
   I.see(moment(randomWeekDayIn6Weeks).format('DD MMMM YYYY'), datesYouCantAttendHearingAnswer);
-});
+}).retry(1);

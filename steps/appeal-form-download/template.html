@@ -1,5 +1,4 @@
-{% extends "components/globals.html" %}
-{% extends "look-and-feel/layouts/question.html" %}
+{% extends "components/form-template.html" %}
 {% from "look-and-feel/components/header.njk" import header %}
 
 {% block page_title %}{{ content.titleHead }}{% endblock %}
@@ -14,5 +13,9 @@
     <p>{{ content.subtitle }}</p>
 
     <a class="button" href="{{ formDownload.link }}">{{ content.button.text }}</a>
+
+    {% block after_form -%}
+        {% include "components/sessionTimeoutMessage.html" %}
+    {%- endblock %}
 
 {% endblock %}

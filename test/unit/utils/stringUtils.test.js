@@ -1,5 +1,10 @@
 const { expect } = require('test/util/chai');
-const { titleise, splitBenefitType, formatMobileNumber } = require('utils/stringUtils');
+const {
+  titleise,
+  splitBenefitType,
+  isNotEmptyString,
+  isGreaterThanOrEqualToFiveCharacters
+} = require('utils/stringUtils');
 const benefitTypes = require('steps/start/benefit-type/types');
 
 describe('stringUtils.js', () => {
@@ -18,17 +23,31 @@ describe('stringUtils.js', () => {
     });
   });
 
-  describe('formatMobileNumber', () => {
-    it('returns correct format when number includes + and is over 11 digits', () => {
-      expect(formatMobileNumber('+447557128316')).to.equal('+44 7557 128 316');
+  describe('isNotEmptyString', () => {
+    it('should return false for an empty string', () => {
+      expect(isNotEmptyString('')).to.equal(false);
     });
 
-    it('returns correct format when number doesn\'t include + but is over 11 digits', () => {
-      expect(formatMobileNumber('447557128316')).to.equal('44 7557 128 316');
+    it('should return true for a non-empty string', () => {
+      expect(isNotEmptyString('badgers')).to.equal(true);
+    });
+  });
+
+  describe('isGreaterThanOrEqualToFiveCharacters', () => {
+    it('should return false for an empty string', () => {
+      expect(isGreaterThanOrEqualToFiveCharacters('')).to.equal(false);
     });
 
-    it('returns correct format when number doesn\'t include + and isn\'t over 11 digits', () => {
-      expect(formatMobileNumber('07557128316')).to.equal('0755 712 8316');
+    it('should return false for a string with less than 5 characters', () => {
+      expect(isGreaterThanOrEqualToFiveCharacters('ABCD')).to.equal(false);
+    });
+
+    it('should return true for a string with exactly 5 characters', () => {
+      expect(isGreaterThanOrEqualToFiveCharacters('ABCDE')).to.equal(true);
+    });
+
+    it('should return true for a string with more than 5 characters', () => {
+      expect(isGreaterThanOrEqualToFiveCharacters('ABCDEF')).to.equal(true);
     });
   });
 });

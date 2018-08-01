@@ -1,0 +1,43 @@
+{% extends "components/globals.html" %}
+{% extends "look-and-feel/layouts/add_another.html" %}
+{% from "look-and-feel/components/fields.njk" import formSection, fileupload %}
+
+{% block page_title %}{{ content.titleHead }}{% endblock %}
+
+{% set pageContent = {
+addAnotherLink: addAnotherLinkContent,
+itemsListLabel: content.itemsListLabel,
+hideItemsListLabel: true
+} %}
+
+{% set title %}
+{{ content.title | safe }}
+{% endset %}
+
+{% set enc_type = 'multipart/form-data' %}
+
+{% block editItem %}
+
+{% call formSection() %}
+
+{{ fileupload(fields.item.uploadEv, '', acceptFileTypes=accept) }}
+
+{% endcall %}
+
+{% endblock %}
+
+{% block item %}
+<span data-index="{{ safeId(item.id) }}">{{ item.uploadEv.value }}</span>
+{% endblock %}
+
+{% block listItems %}
+
+<p>{{ content.description | safe }}</p>
+
+<div id="evidence-upload"></div>
+
+{{ header(content.itemsListLabel, size='small') }}
+{{ super() }}
+
+{% endblock %}
+

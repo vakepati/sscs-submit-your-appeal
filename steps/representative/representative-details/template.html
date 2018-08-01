@@ -1,5 +1,4 @@
-{% extends "components/globals.html" %}
-{% extends "look-and-feel/layouts/question.html" %}
+{% extends "components/form-template.html" %}
 {% from "look-and-feel/components/fields.njk" import textbox, formSection, errorClass, errorsFor %}
 
 {% block page_title %}{{ content.titleHead }}{% endblock %}
@@ -18,6 +17,7 @@
 
             {{ errorsFor(fields.name) }}
 
+            {{ textbox(fields.name.title,    content.fields.name.title.title) }}
             {{ textbox(fields.name.first,    content.fields.name.first.title) }}
             {{ textbox(fields.name.last,     content.fields.name.last.title) }}
             {{ textbox(fields.name.organisation, content.fields.name.organisation.title) }}

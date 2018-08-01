@@ -30,7 +30,8 @@
     "postCode": {
       "title": "Postcode",
       "error": {
-        "required": "Enter the postcode from your address"
+        "required": "Enter the postcode from your address",
+        "invalidPostcode": "The online appeal service is not available to people from this region. This postcode should match the postcode you entered to access the service."
       }
     },
     "phoneNumber": {
@@ -42,7 +43,7 @@
     },
     "emailAddress": {
       "title": "Email address (optional)",
-      "hint": "You’ll get updates on your appeal, if you choose to attend a hearing",
+      "hint": "You’ll get updates on your appeal and a link so you can track your appeal online",
       "error": {
         "invalid": "You have entered an invalid email address. Check it and enter it again"
       }
@@ -58,6 +59,7 @@
     "emailAddress": {
       "question": "Email"
     },
-    "change": "Change"
+    "change": "Change",
+    "yourDetails": "Your Contact Details"
   }
 }

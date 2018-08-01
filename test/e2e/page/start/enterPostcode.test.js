@@ -1,7 +1,7 @@
 const paths = require('paths');
 const content = require('steps/start/postcode-checker/content.en.json');
 
-Feature('Enter postcode');
+Feature('Enter postcode @batch-12');
 
 Before(I => {
   I.createTheSession();
@@ -12,14 +12,14 @@ Scenario('When I go to the enter postcode page I see the page heading', I => {
   I.see(content.title);
 });
 
-Scenario('When entering a valid listed postcode, I go to the /are-you-an-appointee page', I => {
+Scenario('When entering a postcode in England, I go to the /are-you-an-appointee page', I => {
   I.fillField('#postcode', 'WV11 2HE');
   I.click('Continue');
   I.seeInCurrentUrl(paths.identity.areYouAnAppointee);
 });
 
-Scenario('When I enter a valid non-listed postcode, I go to the /invalid postcode page', I => {
-  I.fillField('#postcode', 'SW1P 4DF');
+Scenario('When I enter a postcode in Scotland, I go to the /invalid postcode page', I => {
+  I.fillField('#postcode', 'EH8 8DX');
   I.click('Continue');
   I.seeInCurrentUrl(paths.start.invalidPostcode);
 });

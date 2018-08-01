@@ -55,7 +55,7 @@ class DateUtils {
   }
 
   static isDateInPast(date) {
-    return moment().isAfter(date, 'day');
+    return moment().isSameOrAfter(date, 'day');
   }
 
   static mrnDateSameAsImage(date) {
@@ -78,7 +78,7 @@ class DateUtils {
   }
 
   static getRandomWeekDayFromDate(date) {
-    return date.clone().weekday(DateUtils.getRandomInt(1, 5));
+    return date.clone().weekday(DateUtils.getRandomInt(3, 4));
   }
 
   static getRandomInt(min, max) {
@@ -110,6 +110,10 @@ class DateUtils {
       if (date1 < date2) return -1;
       return 0;
     });
+  }
+
+  static getCurrentDate() {
+    return moment().format('DD-MM-YYYY');
   }
 }
 

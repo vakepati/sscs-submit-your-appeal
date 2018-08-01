@@ -1,8 +1,12 @@
 @import 'govuk-elements';
 @import '~accessible-autocomplete/src/autocomplete.css';
+@import '~jquery-modal/jquery.modal.css';
 @import 'look-and-feel/check-your-answers';
 @import 'bootstrap-datepicker1.8.0.min';
 @import 'date-picker';
+@import 'h-progress-bar';
+@import 'v-progress-bar';
+@import 'landing-pages';
 
 .form-section {
   margin-bottom: 30px;
@@ -24,7 +28,8 @@ label.form-label[for="signer"] {
 
 #item\.whatYouDisagreeWith,
 #item\.reasonForAppealing,
-#otherReasonForAppealing {
+#otherReasonForAppealing,
+#describeTheEvidence {
   width: 100%;
 }
 
@@ -33,7 +38,12 @@ label.form-label[for="signer"] {
 }
 
 .after-form {
-  padding-top: 1.5em;
+  padding-top: 2em;
+
+  &.time-out-message {
+    color: #454a4c;
+    font-size: 16px;
+  }
 }
 
 .mrn-image {
@@ -63,7 +73,7 @@ label.form-label[for="signer"] {
   }
 }
 
-#title, #pipNumber {
+#name\.title, #title, #pipNumber {
   &.form-control {
     @extend .form-control-1-8;
   }
@@ -80,7 +90,6 @@ label.form-label[for="signer"] {
 }
 
 .banner-blue h1{
-  width: 100%;
   background: #005ea5;
   margin-top: 30px;
   margin-bottom: 30px;
@@ -90,70 +99,37 @@ label.form-label[for="signer"] {
     bottom: 30px;
     left:29px;
   };
-}
-
-.nav-list {
-  column-count: 2;
-  column-gap: 6em;
-  list-style-type: decimal;
-  padding-left: 20px;
-  font-size: 16px;
-  line-height: 30px;
+  @media (min-width: 641px) {
+    width: 100%;
+  }
 }
 
 .internal-server-error {
   margin-top: 30px;
 }
 
-@media (max-width: 640px) {
-  .nav-list {
-    column-count: 1;
-    padding-left: 0;
+.add-another-list {
 
-    li {
-      margin-left: 1.5em;
-      padding-left: 0.3em;
-    }
-  }
-}
+  border-top: 1px solid $border-colour;
 
-.govuk-related-items {
-  border-top: 10px solid $govuk-blue;
-  margin-top: $gutter;
-  padding-top: 5px;
-
-  .heading-medium {
-    margin-bottom: .5em;
-    margin-top: .3em;
-  }
-
-  li {
-    list-style-type: none;
-    margin-bottom: 10px;
-  }
-}
-
-.add-another-list div {
-
-  &:not(.noItems) {
-    padding: 15px 0;
-    width: 100%;
+  > * {
     border-bottom: 1px solid $border-colour;
-
-    &:first-child {
-      border-top: 1px solid $border-colour;
-    }
+    padding: 15px 0;
   }
 
   .add-another-list-item {
     width: 65%;
     display: inline-block;
+
+    &.noItems {
+      width: 100%;
+    }
   }
 
-  .add-another-list-controls{
+  .add-another-list-controls {
     display: inline-block;
     float: right;
-    width: 30%;
+    width: 35%;
 
     .add-another-edit-link {
       padding-right: 40%;
@@ -161,7 +137,7 @@ label.form-label[for="signer"] {
   }
 }
 
-.add-another-add-link{
+.add-another-add-link, [for=uploadEv]{
   @include button($grey-3);
 }
 
@@ -189,4 +165,146 @@ label.form-label[for="signer"] {
       border-bottom: 1px solid #bfc1c3;
     }
   }
+}
+.modal {
+
+  -webkit-border-radius: 0;
+  -moz-border-radius: 0;
+  -o-border-radius: 0;
+  -ms-border-radius: 0;
+  border-radius: 0;
+
+  padding: 0;
+
+  .modal-dialog-box {
+
+    h2 {
+      background-color: #df3034;
+      background-position: 15px center;
+      background-repeat: no-repeat;
+      color: $white;
+      font-size: 19px;
+      font-weight: bold;
+      line-height: 60px;
+      padding-left: 60px;
+      &.icon-important {
+        width: auto;
+        height: auto;
+        background-image: url('/assets/images/icon-important-red-inverse.png');
+      }
+    }
+
+    p {
+      margin: 15px;
+      font-size: 19px;
+      a {
+        margin-left: 5px;
+        &:focus {
+          background-color: transparent;
+          border: 3px solid $yellow;
+        }
+      }
+    }
+    .button {
+      width: inherit;
+    }
+    .button.abort {
+      margin-left: 30px;
+      @include button($grey-3);
+    }
+  }
+}
+
+.screen-reader-text {
+  clip: rect(1px, 1px, 1px, 1px);
+  height: 1px;
+  width: 1px;
+  overflow: hidden;
+  position: absolute !important;
+  top: -999px;
+  left: -999px;
+}
+
+.progress-bar {
+
+  // Display a horizontal progress bar when on larger devices.
+  @include h-progress-bar;
+
+  // Display a vertical progress bar when on smaller devices.
+  @include v-progress-bar;
+
+  // Wrap the progress bar text depending what device you're on.
+  @include wrap-progress-bar-text;
+}
+
+.events {
+  background-color: #eef7ff;
+  padding: 20px 20px;
+
+  .heading-small {
+    margin-top: 0;
+    padding-bottom: 10px;
+  }
+
+  a {
+    display: block;
+    padding-bottom: 20px;
+  }
+
+  details {
+
+    summary {
+      span {
+        margin-left: -5px;
+      }
+    }
+
+    div {
+      position: relative;
+      padding-top: 15px;
+      padding-bottom: 10px;
+      a {
+        display: block;
+        padding-bottom: 15px;
+      }
+    }
+
+    div:after {
+      content: "";
+      background: $grey-2;
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 95%;
+      height: 1px;
+    }
+
+    div:last-child {
+      padding-bottom: 0;
+    }
+
+    div:last-child:after {
+      display: none;
+    }
+  }
+}
+
+
+
+#dynamic-form {
+  .items-container {
+
+    input, textarea {
+      width: 100%;
+    }
+
+    .form-group:last-child {
+      padding-bottom: 20px;
+      border-bottom: 2px solid $grey-2;
+    }
+  }
+}
+
+#evidence-upload-form .error-message {
+  margin-top: 20px;
 }

@@ -7,7 +7,7 @@ const languageInterpreterTextField = 'input[id="selection.interpreterLanguage.la
 const signLanguageTextField = 'input[id="selection.signLanguage.language"]';
 const anythingElseTextField = 'textarea[name="selection.anythingElse.language"]';
 
-Feature('Appellant PIP, one month ago, attends hearing with support');
+Feature('Appellant PIP, one month ago, attends hearing with support @batch-02');
 
 Before(I => {
   I.createTheSession();
@@ -23,20 +23,20 @@ Scenario('Selects sign language interpreter and enters a language', I => {
   I.enterAppellantContactDetailsAndContinue();
   I.selectDoYouWantToReceiveTextMessageReminders(
     textRemindersContent.fields.doYouWantTextMsgReminders.no);
-  I.enterDetailsFromNoRepresentativeToSendingEvidence();
+  I.enterDetailsFromNoRepresentativeToUploadingEvidence();
   I.enterDetailsFromAttendingTheHearingWithSupportToEnd(
     [ fields.selection.signLanguage.requested.label ],
     [{ id: signLanguageTextField, content: testData.hearing.signLanguageType }]);
   I.confirmDetailsArePresent();
   I.see(testData.hearing.signLanguageType);
-});
+}).retry(1);
 
 Scenario('Selects sign language interpreter and other, enters a language', I => {
   I.enterDetailsFromStartToNINO();
   I.enterAppellantContactDetailsAndContinue();
   I.selectDoYouWantToReceiveTextMessageReminders(
     textRemindersContent.fields.doYouWantTextMsgReminders.no);
-  I.enterDetailsFromNoRepresentativeToSendingEvidence();
+  I.enterDetailsFromNoRepresentativeToUploadingEvidence();
   I.enterDetailsFromAttendingTheHearingWithSupportToEnd(
     [
       fields.selection.signLanguage.requested.label,
@@ -50,14 +50,14 @@ Scenario('Selects sign language interpreter and other, enters a language', I => 
   I.confirmDetailsArePresent();
   I.see(testData.hearing.signLanguageType);
   I.see(testData.hearing.anythingElse);
-});
+}).retry(1);
 
 Scenario('Selects sign language interpreter, language interpreter, other, enters a language', I => {
   I.enterDetailsFromStartToNINO();
   I.enterAppellantContactDetailsAndContinue();
   I.selectDoYouWantToReceiveTextMessageReminders(
     textRemindersContent.fields.doYouWantTextMsgReminders.no);
-  I.enterDetailsFromNoRepresentativeToSendingEvidence();
+  I.enterDetailsFromNoRepresentativeToUploadingEvidence();
   I.enterDetailsFromAttendingTheHearingWithSupportToEnd(
     [
       fields.selection.languageInterpreter.requested.label,
@@ -81,4 +81,4 @@ Scenario('Selects sign language interpreter, language interpreter, other, enters
   I.see(testData.hearing.signLanguageType);
   I.see(testData.hearing.anythingElse);
   I.see(testData.hearing.interpreterLanguageType);
-});
+}).retry(1);

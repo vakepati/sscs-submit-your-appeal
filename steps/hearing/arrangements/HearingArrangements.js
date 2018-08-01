@@ -1,6 +1,7 @@
 /* eslint-disable max-len, no-undefined, no-confusing-arrow  */
 
-const { Question, goTo } = require('@hmcts/one-per-page');
+const { Question } = require('@hmcts/one-per-page');
+const { redirectTo } = require('@hmcts/one-per-page/flow');
 const { form, object, text, bool } = require('@hmcts/one-per-page/forms');
 const { answer } = require('@hmcts/one-per-page/checkYourAnswers');
 const { setCYAValue } = require('steps/hearing/arrangements/cyaHearingArrangementsUtils');
@@ -8,6 +9,7 @@ const { errorFor } = require('@hmcts/one-per-page/src/forms/validator');
 const {
   optionSelected,
   languageInList,
+  signLanguageInList,
   emptyLanguageFieldValidation,
   validCharacters
 } = require('steps/hearing/arrangements/hearingArrangementsValidationUtils');
@@ -15,6 +17,7 @@ const cyaContent = require('steps/hearing/arrangements/content.en').cya;
 const sections = require('steps/check-your-appeal/sections');
 const paths = require('paths');
 const languages = require('steps/hearing/arrangements/languages');
+const signLanguages = require('steps/hearing/arrangements/signLanguages');
 
 class HearingArrangements extends Question {
   static get path() {
@@ -22,16 +25,17 @@ class HearingArrangements extends Question {
   }
 
   get languagesList() {
-    const list = [];
+    return HearingArrangements.selectify(languages);
+  }
 
-    languages.forEach(language => {
-      const obj = {};
-      obj.label = language;
-      obj.value = language;
-      list.push(obj);
+  get signLanguagesList() {
+    return HearingArrangements.selectify(signLanguages);
+  }
+
+  static selectify(ar) {
+    return ar.map(el => {
+      return { label: el, value: el };
     });
-
-    return list;
   }
 
   get cyaArrangements() {
@@ -83,7 +87,7 @@ class HearingArrangements extends Question {
           value => emptyLanguageFieldValidation(value)
         ).check(
           errorFor('language', selectionField.signLanguage.language.error.invalid),
-          value => languageInList(value)
+          value => signLanguageInList(value)
         ),
 
         anythingElse: object({
@@ -142,7 +146,7 @@ class HearingArrangements extends Question {
   }
 
   next() {
-    return goTo(this.journey.steps.HearingAvailability);
+    return redirectTo(this.journey.steps.HearingAvailability);
   }
 }
 

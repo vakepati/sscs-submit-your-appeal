@@ -1,14 +1,8 @@
-{% extends "components/globals.html" %}
-{% extends "look-and-feel/layouts/question.html" %}
+{% extends "components/form-template.html" %}
 {% from "look-and-feel/components/fields.njk" import textbox, select, selectionButton, selectionButtons %}
 {% from "components/formElements.html" import textarea %}
 
 {% block page_title %}{{ content.titleHead }}{% endblock %}
-
-{% block head -%}
-<link href="{{ asset_path }}main.css" media="screen" rel="stylesheet" />
-<script src="{{ asset_path }}main.js" type="text/javascript"></script>
-{% endblock %}
 
 {% set title %}
     {{ content.title | safe }}
@@ -52,7 +46,7 @@
                 fields.selection.signLanguage.language,
                 content.fields.selection.signLanguage.language.label,
                 hint = content.fields.selection.signLanguage.language.hint,
-                options = languagesList
+                options = signLanguagesList
             ) }}
         </div>
 

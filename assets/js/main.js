@@ -1,7 +1,19 @@
 import $ from 'jquery';
+import './polyfill/array-from';
+import { remove } from 'lodash';
+import { frontend, redis } from '../../config/default';
 import ShowHideContent from 'govuk/show-hide-content';
+import InactivityAlert from './inactivity-alert';
 import accessibleAutocomplete from 'accessible-autocomplete';
 import datePicker from './date-picker/date-picker';
+import AddReason from './add-reason';
+import EvidenceUpload from './evidence-upload/evidence-upload';
+
+/* eslint-disable init-declarations */
+let timeoutM;
+let evidenceUpload;
+/* eslint-enable init-declarations */
+
 
 function initShowHideContent() {
   const showHideContent = new ShowHideContent();
@@ -10,9 +22,21 @@ function initShowHideContent() {
 
 function initAutocomplete() {
   const selects = document.querySelectorAll('select');
-  selects.forEach(select => {
+  $.each(selects, (index, select) => {
     accessibleAutocomplete.enhanceSelectElement({
-      selectElement: select
+      selectElement: select,
+      source: (query, populateResults) => {
+        const minQueryLength = 1;
+        if (query.length < minQueryLength) {
+          return null;
+        }
+        const options = Array.from(select.options).map(opt => opt.value);
+        const startingWithLetter = remove(options, opt =>
+          opt.match(new RegExp(`^${query}.+`, 'i')));
+        const containingLetter = remove(options, opt =>
+          opt.match(new RegExp(`^.*${query}*`, 'i')));
+        return populateResults([...startingWithLetter, ...containingLetter]);
+      }
     });
   });
 }
@@ -20,12 +44,62 @@ function initAutocomplete() {
 function initDatePicker() {
   if ($('#date-picker').length) {
     $('.add-another-add-link').hide();
+    $('#date-picker-content').show();
     datePicker.init();
+  }
+}
+
+function hasMetaRefresh() {
+  // document.querySelectorAll('noscript meta') doesn't work! :-o
+  const noscripts = document.querySelectorAll('noscript');
+  return Array.from(noscripts).some(el => el.innerHTML.indexOf('refresh') !== -1);
+}
+
+function initTM(sessionSeconds, showAfterSeconds) {
+  if (hasMetaRefresh()) {
+    timeoutM = new InactivityAlert(sessionSeconds, showAfterSeconds);
+  }
+}
+
+function destroyTM() {
+  if (timeoutM) {
+    timeoutM.destroy();
+  }
+}
+
+function destroyEvidenceUpload() {
+  if (evidenceUpload) {
+    evidenceUpload.destroy();
+    evidenceUpload = null;
+  }
+}
+
+function initEvidenceUpload() {
+  if ($('#evidence-upload').length) {
+    evidenceUpload = new EvidenceUpload('#evidence-upload');
+  }
+}
+
+function initAddReason() {
+  if (AddReason.startAddReason()) {
+    /* eslint-disable no-new */
+    new AddReason();
   }
 }
 
 $(document).ready(() => {
   initShowHideContent();
   initAutocomplete();
+  initTM(redis.timeout, frontend.inactivityAlert);
   initDatePicker();
+  initEvidenceUpload();
+  initAddReason();
+});
+
+$(window).on('unload', () => {
+  destroyTM();
+  destroyEvidenceUpload();
+  if ($('#date-picker').length) {
+    $('.prev, .next').off('click');
+  }
 });

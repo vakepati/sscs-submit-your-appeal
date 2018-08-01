@@ -3,7 +3,19 @@
 {% from "look-and-feel/components/fields.njk" import textbox, formSection, errorClass, errorsFor %}
 {% from "components/formElements.html" import textarea %}
 
-{% block page_title %}{{ content.titleHead }}{% endblock %}
+{% set titleHead %}
+    {{ content.titleHead | safe if isListMode }}
+    {{ content.titleHeadEdit | safe if isEditMode }}
+{% endset %}
+
+{% block page_title %}{{ titleHead }}{% endblock %}
+
+{% block head %}
+{{ super() }}
+    <noscript>
+        <meta http-equiv="refresh" content="{{ timeOut }};URL='/session-timeout'">
+    </noscript>
+{% endblock %}
 
 {% set title %}
     {{ content.title | safe if isListMode }}
@@ -14,9 +26,17 @@
     addAnotherLink: addAnotherLinkContent,
     itemLabel: content.itemLabel,
     noItemsMessage: content.noReasons,
-    itemsListLabel: '',
+    itemsListLabel: content.itemsListLabel,
+    hideItemsListLabel: true,
     editItemLabel: content.itemLabel
 } %}
+
+{% block full_width %}
+{{ super() }}
+    <div>
+        {% include "components/inactivity-alert.html" %}
+    </div>
+{% endblock %}
 
 {% block noItems %}
     <div id="items" class="noItems {{ errorClass(fields.items) }}">
@@ -48,7 +68,6 @@
     <p>{{ content.dwpExplained }}</p>
     <p>{{ content.readYouMRN }}</p>
     {{ textbox(fields.item.whatYouDisagreeWith, content.fields.whatYouDisagreeWith.label) }}
-    {{ textarea(fields.item.reasonForAppealing, content.fields.reasonForAppealing.label) }}
+    {{ textarea(fields.item.reasonForAppealing, content.fields.reasonForAppealing.label, placeholder=content.placeholder) }}
 {% endblock %}
-
 

@@ -5,8 +5,12 @@ const representative = require('steps/representative/representative/content.en')
 const theHearing = require('steps/hearing/the-hearing/content.en');
 const support = require('steps/hearing/support/content.en');
 const availability = require('steps/hearing/availability/content.en');
-const reasonsForAppealing = require('steps/reasons-for-appealing/reason-for-appealing/content.en');
 const datesCantAttend = require('steps/hearing/dates-cant-attend/content.en');
+const evidenceProvide = require('steps/reasons-for-appealing/evidence-provide/content.en.json');
+
+const config = require('config');
+
+const evidenceUploadEnabled = config.get('features.evidenceUpload.enabled');
 
 const selectors = require('steps/check-your-appeal/selectors');
 const paths = require('paths');
@@ -17,7 +21,6 @@ const oneMonthAgo = DateUtils.oneMonthAgo();
 
 function enterDetailsFromStartToNINO() {
   const I = this;
-
   I.enterBenefitTypeAndContinue(testData.benefitType.code);
   I.enterPostcodeAndContinue(appellant.contactDetails.postCode);
   I.selectAreYouAnAppointeeAndContinue(appointee.fields.isAppointee.no);
@@ -30,20 +33,26 @@ function enterDetailsFromStartToNINO() {
   I.enterAppellantNINOAndContinue(appellant.nino);
 }
 
-function enterDetailsFromNoRepresentativeToSendingEvidence() {
+function enterDetailsFromNoRepresentativeToUploadingEvidence() {
   const I = this;
 
   I.selectDoYouHaveARepresentativeAndContinue(representative.fields.hasRepresentative.no);
-  I.addReasonsForAppealingAndContinue(
-    testData.reasonsForAppealing.reasons[0], reasonsForAppealing.links.add);
+  I.addReasonForAppealingUsingTheOnePageFormAndContinue(testData.reasonsForAppealing.reasons[0]);
   I.enterAnythingElseAndContinue(testData.reasonsForAppealing.otherReasons);
-  I.readSendingEvidenceAndContinue();
+  if (!evidenceUploadEnabled) {
+    I.readSendingEvidenceAndContinue();
+  }
+  if (evidenceUploadEnabled) {
+    I.selectAreYouProvidingEvidenceAndContinue(evidenceProvide.fields.evidenceProvide.yes);
+    I.uploadAPieceOfEvidence();
+    I.enterDescription('Some description of the evidence');
+  }
 }
 
 function enterDetailsFromNoRepresentativeToEnd() {
   const I = this;
 
-  I.enterDetailsFromNoRepresentativeToSendingEvidence();
+  I.enterDetailsFromNoRepresentativeToUploadingEvidence();
   I.enterDoYouWantToAttendTheHearing('No');
   I.readYouHaveChosenNotToAttendTheHearingNoticeAndContinue();
 }
@@ -66,7 +75,9 @@ async function enterDetailsFromAttendingTheHearingDatePickerToEnd(date) {
   I.enterDoYouWantToAttendTheHearing(theHearing.fields.attendHearing.yes);
   I.selectDoYouNeedSupportAndContinue(support.fields.arrangements.yes);
   I.checkAllArrangementsAndContinue();
+  I.wait(2);
   I.selectHearingAvailabilityAndContinue(availability.fields.scheduleHearing.yes);
+  I.wait(2);
   await I.selectDates([date]);
   I.click('Continue');
 }
@@ -140,7 +151,7 @@ function confirmDetailsArePresent(hasMRN = true, mrnDate = oneMonthAgo) {
 
 module.exports = {
   enterDetailsFromStartToNINO,
-  enterDetailsFromNoRepresentativeToSendingEvidence,
+  enterDetailsFromNoRepresentativeToUploadingEvidence,
   enterDetailsFromAttendingTheHearingToEnd,
   enterDetailsFromAttendingTheHearingDatePickerToEnd,
   enterDetailsFromNoRepresentativeToEnd,
