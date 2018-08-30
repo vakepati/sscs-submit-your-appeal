@@ -11,6 +11,7 @@ class EvidenceUpload {
     this.elId = 'uploadEv';
     this.listToRead = '.add-another-list';
     this.doTheUpload = this.doTheUpload.bind(this);
+    this.interceptSubmission = this.interceptSubmission.bind(this);
 
     fieldTemplates.getExported(this.setup.bind(this));
     errorSummary.getExported((error, components) => {
@@ -38,10 +39,11 @@ class EvidenceUpload {
         this.formAction = `/evidence-upload/item-${this.numberForNextItem}`;
         this.fileupload = components.fileupload({
           id: this.elId,
-          name: this.elId,
+          name: `item.${this.elId}`,
           value: '',
           errors: this.errors
-        }, 'Choose file', fileTypeWhiteList);
+        }, 'Choose file', fileTypeWhiteList.filter(item => item.indexOf('/') === -1)
+        );
         this.appendForm();
       }
     }, 0);
@@ -77,15 +79,32 @@ class EvidenceUpload {
     $('.column-two-thirds').prepend(summary.val);
   }
   handleInlineError(errors) {
+    const errorId = 'inline-errors-list';
     const hasErrors = Boolean(errors && errors.length);
+    $(`#${errorId}`).remove();
     $('.form-group').toggleClass('form-group-error', hasErrors);
     if (hasErrors) {
-      $('label').after(`<span class="error-message">${errors[0].errors[0]}</span>`);
+      $('label').after(`<span id="${errorId}" class="error-message">${errors[0].errors[0]}</span>`);
     }
   }
   hideUnnecessaryMarkup() {
     $('.add-another-add-link').hide();
     $(`#${this.elId}`).hide();
+  }
+  interceptSubmission(e) {
+    if ($('.noItems').length) {
+      e.preventDefault();
+      const errors = [
+        {
+          field: 'uploadEv',
+          errors: ['Upload at least one file']
+        }
+      ];
+      this.handleErrorSummary(errors);
+      this.handleInlineError(errors);
+      return false;
+    }
+    return true;
   }
   doTheUpload() {
     const formData = new FormData(document.getElementById(this.formId));
@@ -100,18 +119,32 @@ class EvidenceUpload {
         window.location.reload();
       },
       error: error => {
-        if (error && error.responseJSON && error.responseJSON.validationErrors) {
-          this.handleErrorSummary(error.responseJSON.validationErrors);
-          this.handleInlineError(error.responseJSON.validationErrors);
+        if (error) {
+          $('.error-message').remove();
+          $(`#${this.elId}`).val('');
+          /* eslint-disable max-len */
+          const pageErrors = (error.responseJSON && error.responseJSON.validationErrors) ?
+            error.responseJSON.validationErrors :
+            [
+              {
+                field: 'uploadEv',
+                errors: ['Your file could not be uploaded as it is too big in size or it contains a virus.']
+              }
+            ];
+          /* eslint-enable max-len */
+          this.handleErrorSummary(pageErrors);
+          this.handleInlineError(pageErrors);
         }
       }
     });
   }
   attachEventListeners() {
     $(`#${this.elId}`).on('change', this.doTheUpload);
+    $('.button').on('click', this.interceptSubmission);
   }
   detachEventListeners() {
     $(`#${this.elId}`).off('change', this.doTheUpload);
+    $('.button').off('click', this.interceptSubmission);
   }
   appendForm() {
     const markup = this.buildForm();
