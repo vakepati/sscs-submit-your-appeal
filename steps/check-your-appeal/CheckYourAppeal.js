@@ -31,6 +31,7 @@ class CheckYourAppeal extends CYA {
   }
 
   sendToAPI() {
+    this.logger.info(`**** APPEAL ****: ${JSON.stringify(this.journey.values)}`);
     this.logger.info('About to send to api the application with session id ',
       get(this, 'journey.req.session.id'),
       ' the NINO is ',
