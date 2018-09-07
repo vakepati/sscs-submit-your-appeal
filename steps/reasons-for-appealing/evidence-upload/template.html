@@ -34,9 +34,7 @@ hideItemsListLabel: true
 
 <p>{{ content.description | safe }}</p>
 
-<div id="evidence-upload"></div>
-
-{{ header(content.itemsListLabel, size='small') }}
+<div id="evidence-upload"></div>{{ header(content.itemsListLabel, size='small') }}
 {{ super() }}
 
 {% endblock %}
