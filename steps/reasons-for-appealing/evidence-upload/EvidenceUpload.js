@@ -68,6 +68,8 @@ class EvidenceUpload extends AddAnother {
           type: 'multipart'
         });
 
+        incoming.setMaxListeners(0);
+
         incoming.on('fileBegin', () => {
           const emptyRequestSize = 200;
           if (incoming.bytesExpected === null ||
