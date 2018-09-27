@@ -29,7 +29,7 @@
   "e2e": {
     "waitForTimeout": "30000",
     "waitForAction": "2000",
-    "outputDir": "./functional-output",
+    "outputDir": "./functional-output/crossbrowser/reports/**.*",
     "frontendUrl": "http://localhost:3000"
   },
   "features": {
